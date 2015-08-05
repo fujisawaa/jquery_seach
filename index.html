@@ -1,0 +1,412 @@
+<!DOCTYPE HTML>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="ja"><![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="ja"><![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="ja"><![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="ja"><!--<![endif]-->
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=1024" name="viewport">
+<meta name="keywords" content="">
+<link rel="stylesheet" type="text/css" href="/css/import.css" media="screen, print">
+<script src="/js/include.js"></script>
+<script type="text/javascript">
+$(function(){
+//タブ
+$('.searchTypeContents > div').hide();
+$('.searchTypeContents > div:first').show();
+$('#searchType li:first').addClass('active');
+$('#searchType li a').click(function(){ 	
+	$('#searchType li').removeClass('active');
+	$(this).parent().addClass('active'); 
+	var currentTab = $(this).attr('href'); 
+	$('.searchTypeContents > div').hide();
+	$(currentTab).show();
+	return false;
+});
+
+//新着と検索結果出し分け
+$('#searchType li.st_shiborikomi a').click(function(){ 
+	$('#freeWordResultWrap').hide();
+	if($('#shiborikomi input:checked').length > 0){
+		$('#searchResultWrap').show();
+		$('#newTopics').hide();
+	}else{
+		$('#searchResultWrap').hide();
+		$('#newTopics').show();
+	}
+});
+
+$('#searchType li.st_freeword a').click(function(){ 
+	$('#searchResultWrap').hide();
+
+	if($('#textSearch').val() == ''){
+		$('#freeWordResultWrap').hide();
+		$('#newTopics').show();
+	}else{
+		$('#freeWordResultWrap').show();
+		$('#newTopics').hide();
+	}
+});
+
+
+
+//絞り込み検索
+var inputNameCnt = $('.typeDl').length;
+var checkedName = [];
+for(i=0 ; i<inputNameCnt ; i++){
+checkedName[i] = $('.typeDl:eq('+i+') input:eq(0)').attr('name');
+}
+$('#searchResultWrap, #freeWordResultWrap').hide();
+$('.searchTypeContents #shiborikomi input').on('click', function(){
+$('#newTopics').hide();
+$('#searchResultWrap').show();
+$('#searchResultWrap li').hide();
+$('#searchNoResult').show();
+var checkedAllLst = new Object();
+var resultArrayAll = [];
+
+for(i=0 ; i<inputNameCnt ; i++){
+var checkedLst = [];
+$('.typeDl:eq('+i+') input:checked').each(function(){
+checkedLst.push($(this).val());
+});
+checkedAllLst[i] = checkedLst;
+typeCnt = checkedAllLst[i].length;
+var loop = [];
+var loopType = [];
+if(typeCnt != ''){
+for(j=0 ; j<typeCnt ; j++){
+loop.push('$(this).hasClass("' + checkedAllLst[i][j] +'")');
+loopType[i] = '('+ loop.join("||") +')';
+}
+}
+resultArrayAll.push(loopType[i]);
+var resultArray = $.grep(resultArrayAll, function(e){return e;});
+
+}
+var afinishhh = resultArray.join("&&");
+
+$('#searchResultWrap li').each(function(){
+if(eval(afinishhh)){
+$(this).show();
+$('#searchNoResult').hide();
+}
+});
+
+});
+});
+</script>
+
+
+<script type="text/javascript">
+// フリーワード検索
+$(function(){
+	$("#btnSearch").click(function(){
+		$('#freeword #alertText').html('');
+		xmlLoad();  
+});
+
+function xmlLoad(){
+	$.ajaxSetup({
+		   cache: false,
+	});
+
+	$.ajax({
+		   cache: false,
+		   url:'data.xml',
+		   type:'get',
+		   dataType:'xml',
+		   timeout:1000,
+		   success:parse_xml
+	});
+}
+
+function parse_xml(xml,status){
+	if(status!='success')return;
+	var testtttt = $("#textSearch").val().split(' ');
+	var testttttNum = testtttt.length;
+	var searchwordtype = $('input[name="searchwordtype"]:checked').val();
+	//console.log(testtttt);
+	if(testtttt != ""){
+		$("#freeWordResultWrap .newsList").html("");
+		$("#freeWordResultWrap").show();
+		$("#newTopics").hide();
+		if(testttttNum > 1){
+			//and検索のとき
+			if(searchwordtype == "andKensaku"){
+				var resspre = [];
+				//var ress = " 'item:contains('"+ testtttt[0] +"')' ";
+				for(var i=0; i< testttttNum; i++ ){
+					resspre.push("item:contains('"+ testtttt[i] +"')");
+				}
+				var ress = resspre.join('"+"')
+				var ress = '"' +ress+ '"'
+				//console.log(ress);
+			}else{
+			//or検索のとき
+				var resspre = [];
+				//var ress = " 'item:contains('"+ testtttt[0] +"')' ";
+				for(var i=0; i< testttttNum; i++ ){
+					resspre.push("item:contains('"+ testtttt[i] +"')");
+				}
+				var ress = resspre.join(',')
+				var ress = '"' +ress+ '"'
+				//console.log(ress);
+			}
+
+		}else{
+			var ress = "item:contains('"+ testtttt[0] +"')";
+			var ress = '"' +ress+ '"'
+			//console.log(ress);
+		}
+
+		$('#freewordWord').html(testtttt +'での検索結果');
+
+		if($(xml).find(eval(ress)).length){
+			$(xml).find(eval(ress)).each(disp);
+			//$(xml).find("item:contains('MM')"+"item:contains('テスト4')").each(disp);
+			//$(xml).find("item:contains('MM'), item:contains('テスト4')").each(disp);
+		}else{
+			aaaaaa();
+		}
+
+	}else{
+		$('#freeword #alertText').html('検索ワードを記入してください');
+	}
+	
+}
+
+
+function disp(){
+	
+	//各要素を変数に格納
+	var $date = $(this).find('date').text();
+	var $thum = $(this).find('thum').text();
+	var $url = $(this).find('url').text();
+	var $title = $(this).find('title').text();
+	
+	//HTMLを生成
+	$('<li><div class="thum"><img src=" '+ $thum + '" alt=""></div><div class="text"><span class="date">'+ $date +'</span><a href="'+ $url +'" target="_blank">'+ $title +'</a></div></li>').appendTo("#freeWordResultWrap .newsList");
+
+}
+
+
+function aaaaaa(){
+	//該当がない
+	$('<li>該当がありません</li>').appendTo("#freeWordResultWrap .newsList");
+}
+
+});
+
+
+</script>
+
+
+
+
+<title>juerySearch</title>
+
+<!--[if lt IE 9]>
+<script src="/js/html5shiv.js"></script>
+<![endif]-->
+</head>
+
+
+<body>
+
+
+<div id="searchWrapper">
+<h1>juerySearch</h1>
+<div id="searchArea">
+<div id="searchAreaContents">
+<ul id="searchType">
+<li class="st_shiborikomi"><a href="#shiborikomi">絞り込み検索</a></li>
+<li class="st_freeword"><a href="#freeword">フリーワード検索</a></li>
+</ul>
+<div class="searchTypeContents">
+<div id="shiborikomi">
+<dl class="typeDl">
+<dt>・カテゴリ1</dt>
+<dd>
+<label><input type="checkbox" name="category01" value="ctg01_chair">いす</label>
+<label><input type="checkbox" name="category01" value="ctg01_book">本</label>
+<label><input type="checkbox" name="category01" value="ctg01_shoes">くつ</label>
+<label><input type="checkbox" name="category01" value="ctg01_skirt">スカート</label>
+<label><input type="checkbox" name="category01" value="ctg01_watch">時計</label>
+</dd>
+</dl>
+
+<dl class="typeDl">
+<dt>・カテゴリ2</dt>
+<dd>
+<label><input type="checkbox" name="category02" value="ctg02_red">赤</label>
+<label><input type="checkbox" name="category02" value="ctg02_blue">青</label>
+<label><input type="checkbox" name="category02" value="ctg02_yellow">黄色</label>
+<label><input type="checkbox" name="category02" value="ctg02_green">緑</label>
+<label><input type="checkbox" name="category02" value="ctg02_lightBlue">水色</label>
+</dd>
+</dl>
+
+<dl class="typeDl">
+<dt>・カテゴリ3</dt>
+<dd>
+<label><input type="checkbox" name="category03" value="ctg03_border">ボーダー</label>
+<label><input type="checkbox" name="category03" value="ctg03_arabesque">からくさ</label>
+<label><input type="checkbox" name="category03" value="ctg03_dot">ドット</label>
+<label><input type="checkbox" name="category03" value="ctg03_check">チェック</label>
+</dd>
+</dl>
+
+
+
+</div>
+<!-- /#shiborikomi -->
+<div id="freeword">
+<div class="freewordSearchBox">
+
+<input name="textSearch" value="" type="text" id="textSearch">
+<input id="btnSearch" type="image" src="/images/btn_seach.png" value="検索" alt="検索">
+<p id="alertText"></p>
+<input type="radio" name="searchwordtype" value="orKensaku" checked="checked">or検索
+<input type="radio" name="searchwordtype" value="andKensaku">and検索
+</div><!-- /.searchBox -->
+</div>
+<!-- /#freeword -->
+</div>
+</div><!-- /#searchAreaContents -->
+</div><!-- /#searchArea -->
+
+
+
+
+<div id="contents">
+<div id="mainContents">
+<section class="contentsSection" id="newTopics">
+<h2>新着情報</h2>
+<ul class="newsList">
+
+<li class="ctg01_chair ctg02_red">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.10]</span>
+<a href="#" target="_blank">赤い椅子</a></div>
+</li>
+
+<li class="ctg01_book ctg02_green ctg03_arabesque">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.09]</span>
+<a href="#" target="_blank">緑からくさ模様の本</a></div>
+</li>
+
+<li class="ctg01_shoes ctg01_skirt ctg02_lightBlue">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.09]</span>
+<a href="#" target="_blank">水色のスカートとくつのセット</a></div>
+</li>
+
+<li class="ctg02_yellow ctg01_shoes">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.08]</span>
+<a href="#" target="_blank">黄色のくつ</a></div>
+</li>
+
+</ul>
+</section><!-- /.contentsSection -->
+
+
+
+<section class="contentsSection" id="searchResultWrap">
+<h2>検索結果</h2>
+<ul class="newsList">
+
+<li class="ctg01_chair ctg02_red">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.10]</span>
+<a href="#" target="_blank">赤い椅子</a></div>
+</li>
+
+<li class="ctg01_book ctg02_green ctg03_arabesque">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.09]</span>
+<a href="#" target="_blank">緑からくさ模様の本</a></div>
+</li>
+
+<li class="ctg01_shoes ctg01_skirt ctg02_lightBlue">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.09]</span>
+<a href="#" target="_blank">水色のスカートとくつのセット</a></div>
+</li>
+
+<li class="ctg02_yellow ctg01_shoes">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.08]</span>
+<a href="#" target="_blank">黄色のくつ</a></div>
+</li>
+
+<li class="ctg01_skirt ctg02_red">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.08]</span>
+<a href="#" target="_blank">赤いスカート</a></div>
+</li>
+
+
+<li class="ctg01_watch ctg02_lightBlue">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.08]</span>
+<a href="#" target="_blank">水色の時計</a></div>
+</li>
+
+
+<li class="ctg02_lightBlue ctg03_dot ctg03_dot">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.07]</span>
+<a href="#" target="_blank">水色ドット柄のスカート</a></div>
+</li>
+
+
+<li class="ctg03_border">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.06]</span>
+<a href="#" target="_blank">ボーダーがかわいいグッズ</a></div>
+</li>
+
+
+<li class="ctg03_check ctg01_chair">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.05]</span>
+<a href="#" target="_blank">チェック柄の椅子</a></div>
+</li>
+
+<li class="ctg01_book ctg02_green">
+<div class="thum"></div>
+<div class="text"><span class="date">[2015.06.05]</span>
+<a href="#" target="_blank">緑色の本</a></div>
+</li>
+
+
+<li id="searchNoResult">検索結果はありません</li>
+</ul>
+</section><!-- /.contentsSection -->
+
+
+
+<section class="contentsSection" id="freeWordResultWrap">
+<h2>検索結果</h2>
+<p id="freewordWord"></p>
+<ul class="newsList">
+</ul>
+</section><!-- /.contentsSection -->
+
+
+
+</div><!-- /#mainContents -->
+</div><!-- /#contents -->
+
+</div><!-- /#searchWrapper -->
+
+</body>
+</html>
+
+
+
+

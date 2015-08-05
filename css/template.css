@@ -1,0 +1,148 @@
+@charset "utf-8";
+
+/* overwrite common.css
+----------------------------------------------------------------*/
+/* ========== noticeBox ========== */
+.noticeBox{
+position:relative;
+background:#f1f1f1;
+padding:20px 40px;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius: 5px;
+}
+
+/* ========== icon ========== */
+.iconList {
+background:url(../professional/images/icon_list.gif) no-repeat left 0.5em;
+}
+
+/* ===== listMark ===== */
+.listMark li {
+background:url(../professional/images/icon_list.gif) no-repeat left 0.5em;
+padding-left:14px;
+}
+
+/* ===== heading ===== */
+.categoryTtl {
+background:#8d8d8d;
+padding:15px 0;
+margin-bottom:30px;
+}
+
+.categoryTtl h1 {
+font-weight:bold;
+font-size: 162.5%;
+color:#fff;
+width:840px;
+margin:0 auto;
+padding:0 80px;
+}
+
+#moviePage .categoryTtl h1 {
+background:url(/case_library/common/renew/images/bg_ttl_h1_movie.png) no-repeat 20px 50%;
+}
+
+#MM .categoryTtl {
+background:url(/case_library/common/renew/images/bg_ttl_h1_MM.png) #5bb9ec repeat-x top left;
+}
+#MDS .categoryTtl {
+background:url(/case_library/common/renew/images/bg_ttl_h1_MDS.png) #146fbd repeat-x top left;
+}
+#POM .categoryTtl {
+background:url(/case_library/common/renew/images/bg_ttl_h1_POM.png) #007482 repeat-x top left;
+}
+.categoryTtl h1 {
+background:url(/case_library/common/renew/images/bg_ttl_h1_library.png) no-repeat 20px 50%;
+}
+
+
+h2 {
+font-size: 162.5%;
+border-bottom: 4px solid #cccccc;
+margin-bottom: 16px;
+padding-bottom: 16px;
+}
+
+h2.noLine {
+border:none;
+padding-bottom:0;
+}
+
+#MM h2 {
+border-color:#5bb9ec;
+}
+
+#MDS h2 {
+border-color:#146fbd;
+}
+
+#POM h2 {
+border-color:#007482;
+}
+
+
+h3 {
+font-weight:bold;
+}
+
+.popup .ttl h2 {
+font-size:150%;
+line-height:1;
+color:#fff;
+background:#ccc;
+border-bottom: none;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+border-radius:5px;
+margin-bottom: 24px;
+padding: 10px 20px;
+position:relative;
+}
+.popup #MM .ttl h2 {
+background:#5bb9ec;
+}
+
+.popup #MDS .ttl h2 {
+background:#146fbd;
+}
+
+.popup #POM .ttl h2 {
+background:#007482
+}
+
+#home h2 {
+margin-bottom:16px;
+padding-bottom:0;
+border:none;
+padding-left:50px;
+}
+
+#loginPage h2{
+padding-left:0 !important;
+}
+
+#home h2 span {
+font-size:61.53%;
+margin-left:26px;
+}
+
+#home #library h2 {
+background:url(/common/renew/images/icon_library.png) no-repeat left 50%;
+}
+
+#home #newTopics h2 {
+background:url(/common/renew/images/icon_newTopics.png) no-repeat left 50%;
+}
+
+#home #chumoku h2 {
+background:url(/common/renew/images/icon_chumoku.png) no-repeat left 50%;
+}
+
+#home #movie h2 {
+background:url(/common/renew/images/icon_movie.png) no-repeat left 50%;
+border-bottom: solid 1px #999999;
+line-height: 76px;
+}
+
+
